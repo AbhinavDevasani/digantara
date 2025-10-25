@@ -1,0 +1,27 @@
+services:
+  # API Service (builds from Dockerfile.api)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/usr/src/app/src # Mount src for hot-reloading
+    env_file: ./.env
+    command: npm run start:dev:api
+    depends_on:
+      - redis
+
+ 
+
+  # Queue
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
