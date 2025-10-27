@@ -1,4 +1,3 @@
-
 import { Queue } from 'bullmq';
 
 const connection = {

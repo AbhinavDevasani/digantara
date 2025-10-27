@@ -1,48 +1,42 @@
+import cron from "node-cron";
+import Job from "../models/jobModel.js";
+import cronstrue from "cronstrue";
+import parser from "cron-parser"; 
 
-import jobRepository from '../repositories/job.repository.js';
-import { jobQueue } from '../scheduler/queue.js';
-import cronParser from 'cron-parser';
+export const scheduleJob = (job) => {
+  const cronExpr = job.schedule;
 
-class JobService {
-  async create(jobData) {
-    let nextRunAt;
+  
+  const humanReadable = cronstrue.toString(cronExpr, {
+    use24HourTimeFormat: true,
+    verbose: true,
+  });
+
+
+  try {
+    const interval = parser.parseExpression(cronExpr);
+    job.nextRunAt = interval.next().toDate();
+  } catch (err) {
+    console.error("Error calculating initial next run:", err);
+  }
+
+
+  cron.schedule(cronExpr, async () => {
+    console.log(`Running job: ${job.name}`);
+
+   
+    job.lastRunAt = new Date();
 
     try {
-      const { schedule, timezone = 'UTC' } = jobData;
-
-      const parse = cronParser.parseExpression || cronParser.default?.parseExpression;
-      const interval = parse(schedule, { tz: timezone });
-      nextRunAt = interval.next().toDate();
+      const interval = parser.parseExpression(cronExpr);
+      job.nextRunAt = interval.next().toDate(); 
     } catch (err) {
-      console.error('Error parsing cron expression:', jobData.schedule, err);
-      throw new Error('Invalid cron expression');
+      console.error("Error calculating next run:", err);
     }
 
-    // Save job to MongoDB
-    const job = await jobRepository.create({ ...jobData, nextRunAt });
-    const jobId = job._id.toString();
+    await job.save();
+    console.log(`Job ${job.name} updated`);
+  });
 
-    // Add job to BullMQ queue
-    await jobQueue.add(job.jobType, job.payload, {
-      jobId,
-      repeat: {
-        cron: job.schedule,
-        tz: job.timezone,
-      },
-      removeOnComplete: true,
-      removeOnFail: 50,
-    });
-
-    return job;
-  }
-
-  async getById(id) {
-    return jobRepository.findById(id);
-  }
-
-  async getAll() {
-    return jobRepository.findAll();
-  }
-}
-
-export default new JobService()
+  console.log(`Job scheduled: ${job.name} (${humanReadable})`);
+};

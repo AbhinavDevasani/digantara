@@ -10,15 +10,34 @@ const worker = new Worker(
   async (job) => {
     console.log(`Processing job: ${job.name}`);
     console.log('Payload:', job.data);
-    // Do your task here, e.g., sending email or report generation
+
+    // Example task based on job type
+    switch (job.name) {
+      case 'email':
+        console.log('Sending email with data:', job.data);
+        break;
+      case 'report':
+        console.log('Generating report with data:', job.data);
+        break;
+      case 'calculation':
+        console.log('Performing calculation with data:', job.data);
+        break;
+      case 'notification':
+        console.log('Sending notification with data:', job.data);
+        break;
+      default:
+        console.log('Unknown job type:', job.name);
+    }
   },
   { connection }
 );
 
 worker.on('completed', (job) => {
-  console.log(`Job ${job.id} completed`);
+  console.log(`Job ${job.id} completed successfully`);
 });
 
 worker.on('failed', (job, err) => {
-  console.error(` Job ${job.id} failed:`, err);
+  console.error(`Job ${job.id} failed:`, err);
 });
+
+console.log('Worker started and listening to jobs queue');
