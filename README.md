@@ -26,9 +26,7 @@ Digantara is a lightweight cron-based job scheduling service built with Node.js 
 ## Environment variables
 Create a `.env` file in the project root with:
 - PORT=8000
-- MONGO_URI=<your-mongo-uri>
 
-Do not commit secrets to source control.
 
 ## Quickstart — local
 1. Install dependencies:
