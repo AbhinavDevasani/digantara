@@ -1,7 +1,7 @@
 
-# Digantara
+# Digantara Backend
 
-Digantara is a lightweight cron-based job scheduling service built with Node.js and MongoDB. Jobs (cron expressions) are persisted in MongoDB; the scheduler computes nextRunAt/lastRunAt and executes task handlers.
+Digantara Backend is a lightweight cron-based job scheduling service built with Node.js and MongoDB. Jobs (cron expressions) are persisted in MongoDB; the scheduler computes nextRunAt/lastRunAt and executes task handlers.
 
 ## Features
 - Persisted cron job scheduling (nextRunAt / lastRunAt)
